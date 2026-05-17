@@ -1,4 +1,19 @@
 body{
-    background-color: black;
-    color: white;
+    background-color: #f5f7fa;
+}
+
+/* Navbar */
+.navbar{
+    height: 70px;
+}
+
+/* Card Design */
+.card{
+    border: none;
+    border-radius: 15px;
+}
+
+/* Task Title */
+h5{
+    font-weight: 600;
 }
