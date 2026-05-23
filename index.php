@@ -1,231 +1,200 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+session_start();
+
+if(!isset($_SESSION['user_id'])){
+    header("Location: login.php");
+    exit();
+}
 
 include("includes/db.php");
 
-/* ADD TASK */
+$user_id = $_SESSION['user_id'];
+
 if(isset($_POST['add_task'])){
+
     $title = $_POST['title'];
     $description = $_POST['description'];
     $priority = $_POST['priority'];
 
-    $sql = "INSERT INTO tasks(title, description, priority)
-            VALUES('$title', '$description', '$priority')";
+    $sql = "INSERT INTO tasks(title, description, priority, user_id)
+            VALUES('$title', '$description', '$priority', '$user_id')";
 
-    $result = mysqli_query($conn, $sql);
+    mysqli_query($conn, $sql);
 
-    if($result){
-        header("Location: index.php");
-        exit();
-    } else {
-        die("Insert failed: " . mysqli_error($conn));
-    }
+    header("Location: index.php");
+    exit();
 }
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Task Manager</title>
+
+    <title>Dashboard</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="assets/css/style.css">
+
 </head>
 
-<body>
+<body class="bg-light">
 
-<div class="app-wrapper">
+<div class="d-flex">
 
-    <!-- SIDEBAR NAVIGATION -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">✓</div>
-            <h1 class="sidebar-title">TaskHub</h1>
-        </div>
+    <!-- SIDEBAR -->
+    <div class="bg-dark text-white p-4 vh-100" style="width:250px;">
 
-        <nav class="sidebar-nav">
-            <li class="sidebar-nav-item">
-                <a href="#" class="sidebar-nav-link active">
-                    <span class="sidebar-nav-icon">📋</span>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="sidebar-nav-item">
-                <a href="#" class="sidebar-nav-link">
-                    <span class="sidebar-nav-icon">⭐</span>
-                    <span>Priority</span>
-                </a>
-            </li>
-            <li class="sidebar-nav-item">
-                <a href="#" class="sidebar-nav-link">
-                    <span class="sidebar-nav-icon">✅</span>
-                    <span>Completed</span>
-                </a>
-            </li>
-            <li class="sidebar-nav-item">
-                <a href="#" class="sidebar-nav-link">
-                    <span class="sidebar-nav-icon">⚙️</span>
-                    <span>Settings</span>
-                </a>
-            </li>
-        </nav>
-    </aside>
+        <h3 class="fw-bold mb-4">Task Manager</h3>
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
+        <p>
+            Welcome,
+            <strong><?php echo $_SESSION['username']; ?></strong>
+        </p>
 
-        <!-- TOP NAVBAR -->
-        <nav class="navbar-top">
-            <h2 class="navbar-title">My Tasks</h2>
-            <div class="navbar-actions">
-                <div class="navbar-user">
-                    <div class="navbar-avatar">U</div>
-                    <span class="text-sm">User</span>
+        <a href="logout.php" class="btn btn-danger mt-3">
+            Logout
+        </a>
+
+    </div>
+
+    <!-- MAIN -->
+    <div class="flex-grow-1 p-4">
+
+        <h2 class="mb-4">My Tasks</h2>
+
+        <div class="row">
+
+            <!-- FORM -->
+            <div class="col-md-4">
+
+                <div class="card shadow-sm p-4">
+
+                    <h5 class="mb-3">Create Task</h5>
+
+                    <form method="POST">
+
+                        <input type="text"
+                               name="title"
+                               class="form-control mb-3"
+                               placeholder="Task title"
+                               required>
+
+                        <textarea name="description"
+                                  class="form-control mb-3"
+                                  placeholder="Task description"
+                                  rows="4"
+                                  required></textarea>
+
+                        <select name="priority"
+                                class="form-select mb-3"
+                                required>
+
+                            <option value="">Select Priority</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+
+                        </select>
+
+                        <button name="add_task"
+                                class="btn btn-primary w-100">
+
+                            Add Task
+
+                        </button>
+
+                    </form>
+
                 </div>
+
             </div>
-        </nav>
 
-        <!-- CONTENT AREA -->
-        <div class="content">
+            <!-- TASKS -->
+            <div class="col-md-8">
 
-            <div class="dashboard-grid">
+                <?php
 
-                <!-- LEFT SECTION: CREATE TASK FORM -->
-                <div class="dashboard-section">
+                $sql = "SELECT * FROM tasks
+                        WHERE user_id = '$user_id'
+                        ORDER BY id DESC";
 
-                    <div class="card fade-in">
-                        <div class="card-header">
-                            <div>
-                                <h3 class="card-title">Create New Task</h3>
-                                <p class="card-subtitle">Add a new task to your list</p>
-                            </div>
-                        </div>
+                $result = mysqli_query($conn, $sql);
 
-                        <form method="POST" id="taskForm">
+                if(mysqli_num_rows($result) > 0){
 
-                            <div class="form-group">
-                                <label for="title" class="form-label">Task Title</label>
-                                <input 
-                                    type="text" 
-                                    id="title"
-                                    name="title" 
-                                    class="form-control" 
-                                    placeholder="e.g., Design homepage mockup"
-                                    required
-                                >
-                                <span class="form-hint">Give your task a clear, descriptive name</span>
-                            </div>
+                    while($row = mysqli_fetch_assoc($result)){
 
-                            <div class="form-group">
-                                <label for="description" class="form-label">Description</label>
-                                <textarea 
-                                    id="description"
-                                    name="description" 
-                                    class="form-textarea" 
-                                    placeholder="Add details about this task..."
-                                    required
-                                ></textarea>
-                                <span class="form-hint">Provide context and details for this task</span>
-                            </div>
+                        $badge = "success";
 
-                            <div class="form-group">
-                                <label for="priority" class="form-label">Priority Level</label>
-                                <select id="priority" name="priority" class="form-select" required>
-                                    <option value="">Select Priority</option>
-                                    <option value="High">🔴 High</option>
-                                    <option value="Medium">🟡 Medium</option>
-                                    <option value="Low">🟢 Low</option>
-                                </select>
-                                <span class="form-hint">Choose the priority level for this task</span>
-                            </div>
-
-                            <button type="submit" name="add_task" class="btn btn-primary btn-block">
-                                ➕ Create Task
-                            </button>
-
-                        </form>
-
-                    </div>
-
-                </div>
-
-                <!-- RIGHT SECTION: TASKS LIST -->
-                <div class="dashboard-section">
-
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="card-title mb-0">Tasks</h3>
-                        <span class="badge badge-low" id="taskCount">0 tasks</span>
-                    </div>
-
-                    <div id="tasksList">
-                        <?php
-
-                        $sql = "SELECT * FROM tasks ORDER BY id DESC";
-                        $result = mysqli_query($conn, $sql);
-                        $taskCount = mysqli_num_rows($result);
-
-                        if($taskCount > 0){
-
-                            while($row = mysqli_fetch_assoc($result)){
-
-                                $priority = $row['priority'];
-                                $priorityClass = 'priority-' . strtolower($priority);
-                                $badgeClass = 'badge-' . strtolower($priority);
-
-                                ?>
-
-                                <div class="task-card <?php echo $priorityClass; ?> fade-in">
-
-                                    <div class="task-header">
-                                        <div class="flex-grow-1">
-                                            <h5 class="task-title"><?php echo htmlspecialchars($row['title']); ?></h5>
-                                            <p class="task-description"><?php echo htmlspecialchars($row['description']); ?></p>
-                                        </div>
-                                    </div>
-
-                                    <div class="task-footer">
-                                        <div class="task-priority">
-                                            <span class="badge <?php echo $badgeClass; ?>">
-                                                <?php echo $priority; ?>
-                                            </span>
-                                        </div>
-                                        <div class="task-actions">
-                                            <a href="edit.php?id=<?php echo $row['id']; ?>" class="task-btn task-btn-edit">
-                                                ✏️ Edit
-                                            </a>
-                                            <a href="delete.php?id=<?php echo $row['id']; ?>" class="task-btn task-btn-delete" onclick="return confirm('Are you sure you want to delete this task?');">
-                                                🗑️ Delete
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <?php
-                            }
-
-                        } else {
-                            ?>
-
-                            <div class="card">
-                                <div class="empty-state">
-                                    <div class="empty-state-icon">📭</div>
-                                    <h4 class="empty-state-title">No tasks yet</h4>
-                                    <p class="empty-state-text">Create your first task to get started!</p>
-                                </div>
-                            </div>
-
-                            <?php
+                        if($row['priority'] == "High"){
+                            $badge = "danger";
+                        }
+                        elseif($row['priority'] == "Medium"){
+                            $badge = "warning text-dark";
                         }
 
-                        ?>
+                ?>
+
+                <div class="card shadow-sm p-3 mb-3">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <h5 class="mb-1">
+                                <?php echo $row['title']; ?>
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                <?php echo $row['description']; ?>
+                            </p>
+
+                        </div>
+
+                        <div>
+
+                            <span class="badge bg-<?php echo $badge; ?>">
+                                <?php echo $row['priority']; ?>
+                            </span>
+
+                            <a href="edit.php?id=<?php echo $row['id']; ?>"
+                               class="btn btn-warning btn-sm ms-2">
+
+                                Edit
+
+                            </a>
+
+                            <a href="delete.php?id=<?php echo $row['id']; ?>"
+                               class="btn btn-danger btn-sm">
+
+                                Delete
+
+                            </a>
+
+                        </div>
+
                     </div>
 
                 </div>
+
+                <?php
+
+                    }
+
+                } else {
+
+                    echo "<div class='alert alert-info'>No tasks found.</div>";
+
+                }
+
+                ?>
 
             </div>
 
@@ -234,9 +203,6 @@ if(isset($_POST['add_task'])){
     </div>
 
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/script.js"></script>
 
 </body>
 </html>

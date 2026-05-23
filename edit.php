@@ -1,7 +1,9 @@
 <?php
 
 include("includes/db.php");
+session_start();
 
+$user_id = $_SESSION['user_id'];
 $id = $_GET['id'];
 
 if(isset($_POST['update_task'])){
@@ -10,21 +12,25 @@ if(isset($_POST['update_task'])){
     $priority = $_POST['priority'];
 
     $sql = "UPDATE tasks 
-            SET title='$title',
-                description='$description',
-                priority='$priority'
-            WHERE id=$id";
+        SET title='$title',
+            description='$description',
+            priority='$priority'
+        WHERE id='$id'
+        AND user_id='$user_id'";
 
     mysqli_query($conn, $sql);
 
     header("Location: index.php");
     exit();
 }
-
-$sql = "SELECT * FROM tasks WHERE id=$id";
+$sql = "SELECT * FROM tasks
+        WHERE id='$id'
+        AND user_id='$user_id'";
 $result = mysqli_query($conn, $sql);
 $row = mysqli_fetch_assoc($result);
-
+if(!$row){
+    die("Task not found or access denied.");
+}
 ?>
 
 <!DOCTYPE html>
