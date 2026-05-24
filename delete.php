@@ -3,6 +3,7 @@
 session_start();
 
 include("includes/db.php");
+include("includes/redirect.php");
 
 if(isset($_GET['id'])){
 
@@ -17,7 +18,6 @@ if(isset($_GET['id'])){
 
 }
 
-header("Location: index.php");
-exit();
+velora_safe_redirect('index.php');
 
 ?>

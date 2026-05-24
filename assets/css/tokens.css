@@ -1,0 +1,102 @@
+/* ============================================================
+   VELORA — Design Tokens
+   Warm charcoal · Amber accent · Logo-derived palette
+   ============================================================ */
+
+:root {
+  /* Brand (from login logo mark #E8A838 on #0F0F0F) */
+  --brand:        #E8A838;
+  --brand-dim:    #C68D20;
+  --brand-light:  #F5C96A;
+  --brand-glow:   rgba(232, 168, 56, 0.22);
+  --brand-subtle: rgba(232, 168, 56, 0.09);
+  --brand-ring:   rgba(232, 168, 56, 0.35);
+
+  /* Surfaces */
+  --bg:           #0A0A0B;
+  --bg-elevated:  #0F0F10;
+  --surface-1:    #141416;
+  --surface-2:    #1C1C1F;
+  --surface-3:    #252528;
+  --surface-4:    #323236;
+
+  /* Borders */
+  --border:       rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --border-focus: var(--brand);
+
+  /* Text */
+  --text-primary:   #F4F1EC;
+  --text-secondary: #9C948C;
+  --text-muted:     #5E5852;
+  --text-inverse:   #0A0A0B;
+
+  /* Semantic */
+  --success:   #4ADE80;
+  --success-dim: rgba(74, 222, 128, 0.12);
+  --danger:    #F87171;
+  --danger-dim: rgba(248, 113, 113, 0.12);
+  --warning:   #FBBF24;
+  --info:      #60A5FA;
+  --info-dim:  rgba(96, 165, 250, 0.12);
+
+  /* Priority */
+  --pri-high:   #F87171;
+  --pri-medium: #FBBF24;
+  --pri-low:    #4ADE80;
+
+  /* Star / priority page */
+  --star-glow: 0 0 20px rgba(232, 168, 56, 0.55);
+  --star-pulse: rgba(232, 168, 56, 0.15);
+
+  /* Shadows */
+  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md:  0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lg:  0 16px 48px rgba(0, 0, 0, 0.55);
+  --shadow-xl:  0 24px 64px rgba(0, 0, 0, 0.65);
+  --glow-brand: 0 0 32px rgba(232, 168, 56, 0.28);
+
+  /* Radius */
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-2xl: 24px;
+  --r-full: 9999px;
+
+  /* Spacing scale */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* Typography */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, -apple-system, sans-serif;
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast:   140ms var(--ease-out);
+  --t-base:   240ms var(--ease-out);
+  --t-slow:   400ms var(--ease-out);
+  --t-spring: 320ms cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  /* Layout */
+  --sidebar-w: 260px;
+  --navbar-h: 60px;
+  --content-max: 1280px;
+}

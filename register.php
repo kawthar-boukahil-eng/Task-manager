@@ -28,4 +28,8 @@ if(isset($_POST['register'])){
     }
 
 }
+
+// If no POST, redirect to login
+header("Location: login.php#signup");
+exit();
 ?>

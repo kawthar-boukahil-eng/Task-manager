@@ -3,6 +3,7 @@
 session_start();
 
 include("includes/db.php");
+include("includes/redirect.php");
 
 $user_id = $_SESSION['user_id'];
 
@@ -29,7 +30,6 @@ $update = "UPDATE tasks
 
 mysqli_query($conn, $update);
 
-header("Location: index.php");
-exit();
+velora_safe_redirect('index.php');
 
 ?>

@@ -3,6 +3,11 @@
 include("includes/db.php");
 session_start();
 
+if(!isset($_SESSION['user_id'])){
+    header("Location: login.php");
+    exit();
+}
+
 $user_id = $_SESSION['user_id'];
 $id = $_GET['id'];
 
@@ -23,6 +28,7 @@ if(isset($_POST['update_task'])){
     header("Location: index.php");
     exit();
 }
+
 $sql = "SELECT * FROM tasks
         WHERE id='$id'
         AND user_id='$user_id'";
@@ -31,141 +37,98 @@ $row = mysqli_fetch_assoc($result);
 if(!$row){
     die("Task not found or access denied.");
 }
-?>
 
+$pageTitle  = 'Edit Task';
+$activePage = 'dashboard';
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="assets/favicon.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Task</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+<?php $pageDesc = 'Edit a task in your Velora workspace.'; include('includes/head-app.php'); ?>
 </head>
-
-<body>
+<body class="app-body">
 
 <div class="app-wrapper">
 
-    <!-- SIDEBAR NAVIGATION -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">✓</div>
-            <h1 class="sidebar-title">TaskHub</h1>
-        </div>
+    <?php include("includes/sidebar.php"); ?>
 
-        <nav class="sidebar-nav">
-            <li class="sidebar-nav-item">
-                <a href="index.php" class="sidebar-nav-link">
-                    <span class="sidebar-nav-icon">📋</span>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="sidebar-nav-item">
-                <a href="priority.php" class="sidebar-nav-link">
-                    <span class="sidebar-nav-icon">⭐</span>
-                    <span>Priority</span>
-                </a>
-            </li>
-            <li class="sidebar-nav-item">
-                <a href="completed.php" class="sidebar-nav-link">
-                    <span class="sidebar-nav-icon">✅</span>
-                    <span>Completed</span>
-                </a>
-            </li>
-            <li class="sidebar-nav-item">
-                <a href="#" class="sidebar-nav-link">
-                    <span class="sidebar-nav-icon">⚙️</span>
-                    <span>Settings</span>
-                </a>
-            </li>
-        </nav>
-    </aside>
-
-    <!-- MAIN CONTENT -->
     <div class="main-content">
 
-        <!-- TOP NAVBAR -->
         <nav class="navbar-top">
-            <h2 class="navbar-title">Edit Task</h2>
+            <div class="navbar-left">
+                <h1 class="navbar-title">Edit Task</h1>
+            </div>
             <div class="navbar-actions">
-                <a href="index.php" class="btn btn-secondary btn-sm">← Back to Tasks</a>
+                <a href="index.php" class="btn btn-ghost btn-sm">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M7.5 2L3 6l4.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Back
+                </a>
             </div>
         </nav>
 
-        <!-- CONTENT AREA -->
-        <div class="content">
+        <div class="content page-enter">
+            <div style="max-width: 560px; margin: 0 auto;">
 
-            <div style="max-width: 600px; margin: 0 auto;">
-
-                <div class="card fade-in">
-
-                    <div class="card-header">
+                <div class="panel fade-up">
+                    <div class="panel-header">
                         <div>
-                            <h3 class="card-title">Update Task</h3>
-                            <p class="card-subtitle">Modify task details and save changes</p>
+                            <div class="panel-title">Update Task</div>
+                            <div class="panel-subtitle">Refine details and save your changes</div>
                         </div>
                     </div>
+                    <div class="panel-body">
 
-                    <form method="POST">
+                        <form method="POST" id="taskForm">
 
-                        <div class="form-group">
-                            <label for="title" class="form-label">Task Title</label>
-                            <input 
-                                type="text" 
-                                id="title"
-                                name="title" 
-                                class="form-control" 
-                                value="<?php echo htmlspecialchars($row['title']); ?>"
-                                required
-                            >
-                            <span class="form-hint">Update the task title</span>
-                        </div>
+                            <div class="form-group">
+                                <label class="form-label" for="title">Title</label>
+                                <input type="text"
+                                       id="title"
+                                       name="title"
+                                       class="form-control"
+                                       value="<?php echo htmlspecialchars($row['title']); ?>"
+                                       required>
+                            </div>
 
-                        <div class="form-group">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea 
-                                id="description"
-                                name="description" 
-                                class="form-textarea"
-                                required
-                            ><?php echo htmlspecialchars($row['description']); ?></textarea>
-                            <span class="form-hint">Update task details and context</span>
-                        </div>
+                            <div class="form-group">
+                                <label class="form-label" for="description">Description</label>
+                                <textarea id="description"
+                                          name="description"
+                                          class="form-control"
+                                          rows="5"
+                                          required><?php echo htmlspecialchars($row['description']); ?></textarea>
+                            </div>
 
-                        <div class="form-group">
-                            <label for="priority" class="form-label">Priority Level</label>
-                            <select id="priority" name="priority" class="form-select" required>
-                                <option value="High" <?php if($row['priority']=="High") echo "selected"; ?>>🔴 High</option>
-                                <option value="Medium" <?php if($row['priority']=="Medium") echo "selected"; ?>>🟡 Medium</option>
-                                <option value="Low" <?php if($row['priority']=="Low") echo "selected"; ?>>🟢 Low</option>
-                            </select>
-                            <span class="form-hint">Change the priority level</span>
-                        </div>
+                            <div class="form-group">
+                                <label class="form-label" for="priority">Priority</label>
+                                <div class="select-wrapper">
+                                    <select id="priority" name="priority" class="form-select" required>
+                                        <option value="High"   <?php if($row['priority']=="High")   echo "selected"; ?>>High</option>
+                                        <option value="Medium" <?php if($row['priority']=="Medium") echo "selected"; ?>>Medium</option>
+                                        <option value="Low"    <?php if($row['priority']=="Low")    echo "selected"; ?>>Low</option>
+                                    </select>
+                                </div>
+                            </div>
 
-                        <div style="display: flex; gap: 12px;">
-                            <button type="submit" name="update_task" class="btn btn-primary" style="flex: 1;">
-                                💾 Save Changes
-                            </button>
-                            <a href="index.php" class="btn btn-secondary" style="flex: 1; text-align: center;">
-                                ✕ Cancel
-                            </a>
-                        </div>
+                            <div class="form-actions">
+                                <button type="submit" name="update_task" class="btn btn-primary">
+                                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M10.5 1.5L8.5 1H3a1 1 0 00-1 1v9a1 1 0 001 1h7a1 1 0 001-1V4.5L10.5 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M4.5 1v3h4V1M4.5 9h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                                    Save Changes
+                                </button>
+                                <a href="index.php" class="btn btn-ghost">Cancel</a>
+                            </div>
 
-                    </form>
+                        </form>
 
+                    </div>
                 </div>
 
             </div>
-
         </div>
-
     </div>
-
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="js/script.js"></script>
 </body>
 </html>

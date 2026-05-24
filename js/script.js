@@ -1,215 +1,184 @@
 /**
- * Smart Task Manager - UI Enhancements
- * Modern SaaS dashboard interactions and form validation
+ * Velora — UI Interactions (unified app shell)
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-  initializeUI();
-  initializeFormValidation();
+  document.body.classList.remove('app-loading');
+  initSidebar();
+  initFormValidation();
+  initRipple();
+  initStarButtons();
+  initTaskFilters();
   updateTaskCount();
 });
 
-/**
- * Initialize UI enhancements
- */
-function initializeUI() {
-  // Add smooth transitions to task cards
-  const taskCards = document.querySelectorAll('.task-card');
-  taskCards.forEach((card, index) => {
-    card.style.animationDelay = `${index * 50}ms`;
+/* ── SIDEBAR ──────────────────────────────────── */
+function initSidebar() {
+  const toggle = document.getElementById('sidebarToggle');
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+
+  if (!toggle || !sidebar) return;
+
+  function openSidebar() {
+    sidebar.classList.add('open');
+    if (overlay) overlay.classList.add('active');
+    toggle.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
+    toggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  toggle.addEventListener('click', function () {
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
   });
 
-  // Add focus states to form inputs
-  const formInputs = document.querySelectorAll(
-    '.form-control, .form-select, .form-textarea',
-  );
-  formInputs.forEach((input) => {
-    input.addEventListener('focus', function () {
-      this.style.borderColor = 'var(--primary)';
-    });
+  if (overlay) overlay.addEventListener('click', closeSidebar);
 
-    input.addEventListener('blur', function () {
-      this.style.borderColor = 'var(--gray-300)';
+  sidebar.querySelectorAll('.sidebar-nav-link').forEach(function (link) {
+    link.addEventListener('click', function () {
+      if (window.innerWidth <= 768) closeSidebar();
     });
   });
 
-  // Add hover effects to buttons
-  const buttons = document.querySelectorAll('.btn');
-  buttons.forEach((button) => {
-    button.addEventListener('mouseenter', function () {
-      this.style.transform = 'translateY(-2px)';
-    });
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 768) closeSidebar();
+  });
+}
 
-    button.addEventListener('mouseleave', function () {
-      this.style.transform = 'translateY(0)';
+/* ── FORM VALIDATION ──────────────────────────── */
+function initFormValidation() {
+  const form = document.getElementById('taskForm');
+  if (!form) return;
+
+  form.querySelectorAll('.form-control, .form-select, textarea').forEach(function (el) {
+    el.addEventListener('input', function () {
+      this.style.borderColor = this.value.trim()
+        ? 'var(--success)'
+        : '';
+    });
+    el.addEventListener('blur', function () {
+      if (!this.value.trim()) this.style.borderColor = '';
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      const submit = form.querySelector('[name="add_task"], [name="update_task"]');
+      if (submit) form.submit();
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && form.querySelector('[name="add_task"]')) {
+      form.reset();
+      form.querySelectorAll('.form-control, .form-select, textarea').forEach(function (el) {
+        el.style.borderColor = '';
+      });
+    }
+  });
+}
+
+/* ── RIPPLE ───────────────────────────────────── */
+function initRipple() {
+  document.querySelectorAll('.btn').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = e.clientX - rect.left - size / 2;
+      const y = e.clientY - rect.top - size / 2;
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      r.style.cssText = 'width:' + size + 'px;height:' + size + 'px;left:' + x + 'px;top:' + y + 'px;';
+      this.appendChild(r);
+      setTimeout(function () { r.remove(); }, 600);
     });
   });
 }
 
-/**
- * Form validation and feedback
- */
-function initializeFormValidation() {
-  const taskForm = document.getElementById('taskForm');
+/* ── STAR BUTTONS ─────────────────────────────── */
+function initStarButtons() {
+  document.querySelectorAll('.btn-star').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      const el = this;
+      el.classList.add('animating');
+      el.classList.toggle('starred');
+      setTimeout(function () {
+        window.location.href = el.getAttribute('href');
+      }, 220);
+    });
+  });
+}
 
-  if (taskForm) {
-    taskForm.addEventListener('submit', function (e) {
-      if (!validateForm()) {
-        e.preventDefault();
-        showFormError('Please fill in all required fields');
+/* ── TASK FILTERS (client-side) ───────────────── */
+function initTaskFilters() {
+  const filterBar = document.getElementById('taskFilter');
+  const list = document.getElementById('tasksList');
+  if (!filterBar || !list) return;
+
+  const cards = list.querySelectorAll('.task-card');
+  const emptyFilter = document.getElementById('emptyStateFilter');
+  const emptyDefault = document.getElementById('emptyStateDefault');
+
+  if (!cards.length) return;
+
+  filterBar.querySelectorAll('.filter-chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      const filter = this.dataset.filter;
+
+      filterBar.querySelectorAll('.filter-chip').forEach(function (c) {
+        c.classList.toggle('active', c === chip);
+      });
+
+      let visible = 0;
+
+      cards.forEach(function (card) {
+        const priority = card.dataset.priority;
+        const starred = card.dataset.starred === '1';
+        let show = true;
+
+        if (filter === 'starred') {
+          show = starred;
+        } else if (filter !== 'all') {
+          show = priority === filter;
+        }
+
+        card.classList.toggle('is-hidden', !show);
+        if (show) visible++;
+      });
+
+      if (emptyFilter) {
+        emptyFilter.style.display = visible === 0 ? 'block' : 'none';
       }
+      if (emptyDefault) {
+        emptyDefault.style.display = 'none';
+      }
+
+      updateTaskCount();
     });
-
-    // Real-time validation feedback
-    const titleInput = document.getElementById('title');
-    const descriptionInput = document.getElementById('description');
-    const prioritySelect = document.getElementById('priority');
-
-    if (titleInput) {
-      titleInput.addEventListener('input', function () {
-        if (this.value.trim().length > 0) {
-          this.style.borderColor = 'var(--success)';
-        } else {
-          this.style.borderColor = 'var(--gray-300)';
-        }
-      });
-    }
-
-    if (descriptionInput) {
-      descriptionInput.addEventListener('input', function () {
-        if (this.value.trim().length > 0) {
-          this.style.borderColor = 'var(--success)';
-        } else {
-          this.style.borderColor = 'var(--gray-300)';
-        }
-      });
-    }
-
-    if (prioritySelect) {
-      prioritySelect.addEventListener('change', function () {
-        if (this.value !== '') {
-          this.style.borderColor = 'var(--success)';
-        } else {
-          this.style.borderColor = 'var(--gray-300)';
-        }
-      });
-    }
-  }
+  });
 }
 
-/**
- * Validate form fields
- */
-function validateForm() {
-  const title = document.getElementById('title');
-  const description = document.getElementById('description');
-  const priority = document.getElementById('priority');
-
-  if (!title || !title.value.trim()) return false;
-  if (!description || !description.value.trim()) return false;
-  if (!priority || !priority.value) return false;
-
-  return true;
-}
-
-/**
- * Show form error message
- */
-function showFormError(message) {
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'alert alert-danger alert-dismissible fade show';
-  errorDiv.role = 'alert';
-  errorDiv.innerHTML = `
-    <strong>Validation Error:</strong> ${message}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  `;
-
-  const taskForm = document.getElementById('taskForm');
-  if (taskForm) {
-    taskForm.parentElement.insertBefore(errorDiv, taskForm);
-
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-      errorDiv.remove();
-    }, 5000);
-  }
-}
-
-/**
- * Update task count display
- */
+/* ── TASK COUNT ───────────────────────────────── */
 function updateTaskCount() {
-  const tasksList = document.getElementById('tasksList');
-  const taskCountBadge = document.getElementById('taskCount');
+  const list = document.getElementById('tasksList');
+  const badge = document.getElementById('taskCount');
+  if (!list || !badge) return;
 
-  if (tasksList && taskCountBadge) {
-    const taskCards = tasksList.querySelectorAll('.task-card');
-    const count = taskCards.length;
+  const cards = list.querySelectorAll('.task-card:not(.is-hidden)');
+  const n = cards.length;
 
-    if (count === 0) {
-      taskCountBadge.textContent = 'No tasks';
-    } else if (count === 1) {
-      taskCountBadge.textContent = '1 task';
-    } else {
-      taskCountBadge.textContent = `${count} tasks`;
-    }
+  if (n === 0) {
+    badge.textContent = 'No active tasks';
+  } else if (n === 1) {
+    badge.textContent = '1 active';
+  } else {
+    badge.textContent = n + ' active';
   }
 }
-
-/**
- * Smooth page transitions
- */
-window.addEventListener('pageshow', function () {
-  const fadeInElements = document.querySelectorAll('.fade-in');
-  fadeInElements.forEach((element) => {
-    element.style.animation = 'fadeIn 0.3s ease-out';
-  });
-});
-
-/**
- * Add keyboard shortcuts
- */
-document.addEventListener('keydown', function (e) {
-  // Ctrl/Cmd + Enter to submit form
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-    const taskForm = document.getElementById('taskForm');
-    if (taskForm && validateForm()) {
-      taskForm.submit();
-    }
-  }
-
-  // Escape to clear form
-  if (e.key === 'Escape') {
-    const taskForm = document.getElementById('taskForm');
-    if (taskForm) {
-      taskForm.reset();
-      document
-        .querySelectorAll('.form-control, .form-select, .form-textarea')
-        .forEach((input) => {
-          input.style.borderColor = 'var(--gray-300)';
-        });
-    }
-  }
-});
-
-/**
- * Add ripple effect to buttons
- */
-document.querySelectorAll('.btn').forEach((button) => {
-  button.addEventListener('click', function (e) {
-    const ripple = document.createElement('span');
-    const rect = this.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    const x = e.clientX - rect.left - size / 2;
-    const y = e.clientY - rect.top - size / 2;
-
-    ripple.style.width = ripple.style.height = size + 'px';
-    ripple.style.left = x + 'px';
-    ripple.style.top = y + 'px';
-    ripple.classList.add('ripple');
-
-    this.appendChild(ripple);
-
-    setTimeout(() => ripple.remove(), 600);
-  });
-});
