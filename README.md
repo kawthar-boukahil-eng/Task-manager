@@ -28,7 +28,7 @@ The brand mark (check + list lines) drives the entire design system: charcoal su
 
 | Dashboard | Starred | Completed |
 |-----------|---------|-----------|
-| ![Dashboard](https://placehold.co/400x260/141416/E8A838?text=Dashboard) | ![Starred](https://placehold.co/400x260/141416/E8A838?text=Starred) | ![Completed](https://placehold.co/400x260/141416/E8A838?text=Completed) |
+| ![Dashboard](file:///home/kawthar/Pictures/Screenshots/Screenshot%20from%202026-05-24%2021-05-22.png) | ![Starred](https://placehold.co/400x260/141416/E8A838?text=Starred) | ![Completed](https://placehold.co/400x260/141416/E8A838?text=Completed) |
 
 | Sign In | Settings | Edit Task |
 |---------|----------|-----------|
