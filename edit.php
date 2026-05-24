@@ -63,13 +63,13 @@ if(!$row){
                 </a>
             </li>
             <li class="sidebar-nav-item">
-                <a href="#" class="sidebar-nav-link">
+                <a href="priority.php" class="sidebar-nav-link">
                     <span class="sidebar-nav-icon">⭐</span>
                     <span>Priority</span>
                 </a>
             </li>
             <li class="sidebar-nav-item">
-                <a href="#" class="sidebar-nav-link">
+                <a href="completed.php" class="sidebar-nav-link">
                     <span class="sidebar-nav-icon">✅</span>
                     <span>Completed</span>
                 </a>

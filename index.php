@@ -47,22 +47,40 @@ if(isset($_POST['add_task'])){
 <body class="bg-light">
 
 <div class="d-flex">
+<!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">✓</div>
+            <h1 class="sidebar-title">TaskHub</h1>
+        </div>
 
-    <!-- SIDEBAR -->
-    <div class="bg-dark text-white p-4 vh-100" style="width:250px;">
-
-        <h3 class="fw-bold mb-4">Task Manager</h3>
-
-        <p>
-            Welcome,
-            <strong><?php echo $_SESSION['username']; ?></strong>
-        </p>
-
-        <a href="logout.php" class="btn btn-danger mt-3">
-            Logout
-        </a>
-
-    </div>
+        <nav class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="index.php" class="sidebar-nav-link">
+                    <span class="sidebar-nav-icon">📋</span>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="priority.php" class="sidebar-nav-link">
+                    <span class="sidebar-nav-icon">⭐</span>
+                    <span>Priority</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="completed.php" class="sidebar-nav-link">
+                    <span class="sidebar-nav-icon">✅</span>
+                    <span>Completed</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link">
+                    <span class="sidebar-nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </nav>
+    </aside>
 
     <!-- MAIN -->
     <div class="flex-grow-1 p-4">
@@ -123,6 +141,7 @@ if(isset($_POST['add_task'])){
 
                 $sql = "SELECT * FROM tasks
                         WHERE user_id = '$user_id'
+                        AND completed = 0
                         ORDER BY id DESC";
 
                 $result = mysqli_query($conn, $sql);
@@ -163,7 +182,13 @@ if(isset($_POST['add_task'])){
                             <span class="badge bg-<?php echo $badge; ?>">
                                 <?php echo $row['priority']; ?>
                             </span>
+                           <a href="complete_task.php?id=<?php echo $row['id']; ?>"
+                              class="btn btn-success btn-sm">
 
+                               ✓
+
+                            </a>
+                            
                             <a href="edit.php?id=<?php echo $row['id']; ?>"
                                class="btn btn-warning btn-sm ms-2">
 
@@ -177,7 +202,12 @@ if(isset($_POST['add_task'])){
                                 Delete
 
                             </a>
+                            <a href="toggle_star.php?id=<?php echo $row['id']; ?>"
+                                class="btn btn-sm <?php echo $row['starred'] ? 'btn-warning' : 'btn-outline-warning'; ?>">
 
+                                ★
+
+                            </a>
                         </div>
 
                     </div>
