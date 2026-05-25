@@ -28,7 +28,7 @@ The brand mark (check + list lines) drives the entire design system: charcoal su
 
 | Dashboard | Starred | Completed |
 |-----------|---------|-----------|
-| ![dashboard Screenshot](screenshots/dashboard.png) | ![Starred](screenshots/starred.png | ![Completed](screenshots/completed.png) |
+| ![dashboard Screenshot](screenshots/dashboard.png) | ![Starred](screenshots/starred.png) | ![Completed](screenshots/completed.png) |
 
 | Sign In | Settings | Edit Task |
 |---------|----------|-----------|
