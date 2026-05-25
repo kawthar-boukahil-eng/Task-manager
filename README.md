@@ -28,13 +28,11 @@ The brand mark (check + list lines) drives the entire design system: charcoal su
 
 | Dashboard | Starred | Completed |
 |-----------|---------|-----------|
-| ![dashboard Screenshot](screenshots/dashboard.png) | ![Starred](https://placehold.co/400x260/141416/E8A838?text=Starred) | ![Completed](https://placehold.co/400x260/141416/E8A838?text=Completed) |
+| ![dashboard Screenshot](screenshots/dashboard.png) | ![Starred](screenshots/starred.png | ![Completed](screenshots/completed.png) |
 
 | Sign In | Settings | Edit Task |
 |---------|----------|-----------|
-| ![Auth](https://placehold.co/400x260/141416/E8A838?text=Sign+In) | ![Settings](https://placehold.co/400x260/141416/E8A838?text=Settings) | ![Edit](https://placehold.co/400x260/141416/E8A838?text=Edit+Task) |
-
-> Replace placeholder images with real screenshots after deployment.
+| ![Auth](screenshots/login.png) | ![Settings](screenshots/settings.png) | ![Edit](screenshots/editTask.png) |
 
 ---
 
