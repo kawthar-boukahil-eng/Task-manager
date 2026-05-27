@@ -1,13 +1,11 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
 RUN docker-php-ext-install mysqli
 
-RUN a2dismod mpm_event
-RUN a2enmod mpm_prefork
-RUN a2enmod rewrite
+WORKDIR /app
 
-COPY . /var/www/html/
+COPY . .
 
-EXPOSE 80
+EXPOSE 8080
 
-CMD ["apache2-foreground"]
+CMD php -S 0.0.0.0:8080
